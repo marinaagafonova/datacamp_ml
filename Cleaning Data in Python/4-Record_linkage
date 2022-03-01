@@ -1,0 +1,57 @@
+# ---------- Exercise "The cutoff point" ----------
+
+# Import process from fuzzywuzzy
+from fuzzywuzzy import process
+
+# Store the unique values of cuisine_type in unique_types
+unique_types = restaurants['cuisine_type'].unique()
+
+# Calculate similarity of 'asian' to all values of unique_types
+print(process.extract('asian', unique_types, limit = len(unique_types)))
+
+# Calculate similarity of 'american' to all values of unique_types
+print(process.extract('american', unique_types, limit = len(unique_types)))
+
+# Calculate similarity of 'italian' to all values of unique_types
+print(process.extract('italian', unique_types, limit = len(unique_types)))
+
+
+# ---------- Exercise "Remapping categories II" ----------
+
+# Inspect the unique values of the cuisine_type column
+print(restaurants.cuisine_type.unique())
+
+
+# ---------- Exercise "Pairs of restaurants" ----------
+
+import recordlinkage
+# Create an indexer and object and find possible pairs
+indexer = recordlinkage.Index()
+
+# Block pairing on cuisine_type
+indexer.block('cuisine_type')
+
+# Generate pairs
+pairs = indexer.index(restaurants, restaurants_new)
+
+
+# ---------- Exercise "Similar restaurants" ----------
+
+# Create a comparison object
+comp_cl = recordlinkage.Compare()
+
+
+# ---------- Exercise "Linking them together!" ----------
+
+# Isolate potential matches with row sum >=3
+matches = potential_matches[potential_matches.sum(axis=1) >= 3]
+
+# Get values of second column index of matches
+matching_indices = matches.index.get_level_values(1)
+
+# Subset restaurants_new based on non-duplicate values
+non_dup = restaurants_new[~restaurants_new.index.isin(matching_indices)]
+
+# Append non_dup to restaurants
+full_restaurants = restaurants.append(non_dup)
+print(full_restaurants)
